@@ -122,6 +122,16 @@ class SpoonDatabase
 		$this->setPort($port);
 	}
 
+	/**
+	 * Clean up before serializing
+	 *
+	 * @return	array	The names of the variables to serialize.
+	 */
+	public function __sleep()
+	{
+		$this->handler = null;
+		return array_keys(get_object_vars($this));
+	}
 
 	/**
 	 * Creates a new database connection if it was not yet made.
@@ -331,6 +341,15 @@ class SpoonDatabase
 		return $statement->fetchAll(PDO::FETCH_COLUMN);
 	}
 
+	/**
+	 * Fetch the name of the database
+	 *
+	 * @return	string	The name of the database that is used.
+	 */
+	public function getDatabase()
+	{
+		return $this->database;
+	}
 
 	/**
 	 * Retrieve the debug setting
@@ -342,7 +361,6 @@ class SpoonDatabase
 		return $this->debug;
 	}
 
-
 	/**
 	 * Fetch the name of the database driver
 	 *
@@ -351,27 +369,6 @@ class SpoonDatabase
 	public function getDriver()
 	{
 		return $this->driver;
-	}
-
-	/**
-	 * Fetch the name of the database
-	 *
-	 * @return	string	The name of the database that is used.
-	 */
-	public function getDatabase()
-	{
-		return $this->driver;
-	}
-
-	/**
-	 * Clean up before serializing
-	 *
-	 * @return	array	The names of the variables to serialize.
-	 */
-	public function __sleep()
-	{
-		$this->handler = null;
-		return array_keys(get_object_vars($this));
 	}
 
 	/**
