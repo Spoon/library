@@ -106,7 +106,7 @@ class SpoonFormHidden extends SpoonFormAttributes
 	public function parse(SpoonTemplate $template = null)
 	{
 		// start html generation
-		$output = '<input type="hidden" value="' . $this->getValue() . '"';
+		$output = '<div><input type="hidden" value="' . $this->getValue() . '"';
 
 		// build attributes
 		$attributes = array();
@@ -120,7 +120,7 @@ class SpoonFormHidden extends SpoonFormAttributes
 		// parse hidden field
 		if($template !== null) $template->assign('hid' . SpoonFilter::toCamelCase($this->attributes['name']), $output);
 
-		return $output;
+		return $output . '</div>' ;
 	}
 }
 
