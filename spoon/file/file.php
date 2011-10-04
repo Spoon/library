@@ -343,6 +343,36 @@ class SpoonFile
 		// status
 		return true;
 	}
+		/**
+	 * Recursively deletes a folder and all its contents
+	 *
+	 * @param	string $dir			The path of the directory that you want to delete.
+	 */
+	public function rrmdir($dir) { 
+		//if we're deleting a directory
+ 		if (is_dir($dir)) { 
+ 			//get all the files in the directory
+ 			$files = scandir($dir); 
+ 			//loop through all the files
+ 			foreach ($files as $file) { 
+ 				//its not a hidden file
+ 			  	if ($file != "." && $file != "..") { 
+ 			  		//if the files a directory
+ 			    		if (filetype($dir."/".$file) == "dir")
+ 			    		{ 
+ 			    			//delete this directory and all its contents
+ 			    			self::rrmdir($dir."/".$file); 
+ 			    		}
+ 			    		//it's just a file, delete it
+ 			    		else self::delete($file);
+ 				} 
+ 			} 
+ 			//reset the array
+ 			reset($files); 
+ 			// remove the parent
+ 			rmdir($dir); 
+ 		} 
+ 	} 
 }
 
 
