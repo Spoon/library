@@ -165,6 +165,7 @@ class Spoon
 		$classes['spoontemplate'] = 'template/template.php';
 		$classes['spoontemplatecompiler'] = 'template/compiler.php';
 		$classes['spoontemplatemodifiers'] = 'template/modifiers.php';
+		$classes['spoontext'] = 'text/text.php';
 		$classes['spoonthumbnail'] = 'thumbnail/thumbnail.php';
 		$classes['spoonxmlrpcclient'] = 'xmlrpc/client.php';
 
