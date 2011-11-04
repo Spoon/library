@@ -82,6 +82,11 @@ class SpoonTemplateModifiers
 	 */
 	public static function date($timestamp, $format = 'Y-m-d H:i:s', $language = 'en')
 	{
+		if(is_string($timestamp) && !is_numeric($timestamp))
+		{
+			// use strptime if you want to restrict the input format
+			$timestamp = strtotime($timestamp);
+		}
 		return SpoonDate::getDate($format, $timestamp, $language);
 	}
 
