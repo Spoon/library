@@ -176,6 +176,39 @@ class SpoonFormImage extends SpoonFormFile
 
 
 	/**
+	 * Checks if the extension is allowed.
+	 *
+	 * @return	bool
+	 * @param	string[optional] $error			The error message to set.
+	 */
+	public function isAllowedExtension($error = null)
+	{
+		// set image extensions
+		$extensions = array('jpg', 'png', 'gif', 'jpeg');
+
+		// call parent
+		return parent::isAllowedExtension($extensions, $error);
+	}
+
+
+	/**
+	 * Checks if the mime-type is allowed.
+	 * @see	http://www.w3schools.com/media/media_mimeref.asp
+	 *
+	 * @return	bool
+	 * @param	string[optional] $error		The error message to set.
+	 */
+	public function isAllowedMimeType($error = null)
+	{
+		// set image mime types
+		$allowedTypes = array('image/jpg', 'image/png', 'image/gif', 'image/jpeg');
+
+		// call parent
+		return parent::isAllowedMimeType($allowedTypes, $error);
+	}
+
+
+	/**
 	 * Is this image square?
 	 *
 	 * @return	bool
