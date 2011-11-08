@@ -368,11 +368,19 @@ class SpoonFormFile extends SpoonFormAttributes
 		// create missing directories
 		if(!file_exists(dirname($path))) SpoonDirectory::create(dirname($path));
 
-		// move the file
-		$return = @move_uploaded_file($_FILES[$this->attributes['name']]['tmp_name'], (string) $path);
+		try
+		{
+			// move the file
+			$return = move_uploaded_file($_FILES[$this->attributes['name']]['tmp_name'], (string) $path);
 
-		// chmod file
-		@chmod($path, $chmod);
+			// chmod file
+			chmod($path, $chmod);
+		}
+		catch(Exception $e)
+		{
+			if(SPOON_DEBUG) throw $e;
+			else return false;
+		}
 
 		// return move file status
 		return $return;
