@@ -50,6 +50,8 @@ class SpoonFilterIsURLTest extends PHPUnit_Framework_TestCase
 		$this->assertTrue(SpoonFilter::isURL('http://1337.net'));
 		$this->assertTrue(SpoonFilter::isURL('http://223.255.255.254'));
 		$this->assertTrue(SpoonFilter::isURL('http://feedproxy.google.com/~r/netlog/~3/EdqJ5FkO78o/internet-is-de-petrischaal-van-de-maatschappij'));
+		$this->assertTrue(SpoonFilter::isURL('http://sub_domain.domainname.tld'));
+		$this->assertTrue(SpoonFilter::isURL('http://domain_name.tld'));
 
 		// URLs that should fail
 		$this->assertFalse(SpoonFilter::isURL('http://'));
@@ -90,5 +92,6 @@ class SpoonFilterIsURLTest extends PHPUnit_Framework_TestCase
 		$this->assertFalse(SpoonFilter::isURL('http://.www.foo.bar./8*/'));
 		$this->assertFalse(SpoonFilter::isURL('http://10.1.1.1'));
 		$this->assertFalse(SpoonFilter::isURL('http://10.1.1.254'));
+		$this->assertFalse(SpoonFilter::isURL('http://www.domain_name.tld'));
 	}
 }
