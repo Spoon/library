@@ -128,7 +128,7 @@ class SpoonDatabase
 	private function connect()
 	{
 		// not yet connected
-		if(!$this->handler)
+		if( ! ($this->handler instanceof PDO) )
 		{
 			try
 			{
@@ -763,8 +763,44 @@ class SpoonDatabase
 		// fetch the var
 		return $statement->fetchColumn();
 	}
+		
+	/**
+	 * Inserts data to the database
+	 *
+	 * @param string $table The name of the table
+	 * @param array $values Array with the values to insert
+	 * @return array An array that contains the number of affected rows and the id of the insert
+	 * @access public
+	 */
+	public static function simple_insert($table, array $values)
+	{
+		if(count($values) == 0)
+		{
+			throw new SpoonDatabaseException('You need to provide values for an insert query.', 0, $this->password);
+		}
+		
+		$stat = $this->handler->prepare('INSERT INTO `'.$table.'`(`'.implode('`,`', array_keys($values)).'`) VALUES(:'.implode(', :', array_keys($vaues)).')');
+		
+		if($stat === false)
+		{
+			// get error
+			$errorInfo = $this->handler->errorInfo();
 
-
+			// throw exceptions
+			throw new SpoonDatabaseException($errorInfo[2]);
+		}
+		
+		$affected = $stat->execute($arr);
+		
+		if($stat->errorCode() != 0)
+		{
+			$aError = $stat->errorInfo();
+			throw new SpoonDatabaseException($aError[2]);
+		}
+		
+		return array($affected, $this->handler->lastInsertId());
+		
+	}
 	/**
 	 * Inserts one or more records
 	 *
