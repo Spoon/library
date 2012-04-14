@@ -144,20 +144,17 @@ class SpoonFile
 	 */
 	public static function getExtension($filename, $lowercase = true)
 	{
-		// init var
-		$filename = ($lowercase) ? strtolower((string) $filename) : (string) $filename;
-
-		// fetch extension
-		$chunks = (array) explode('.', $filename);
-
-		// count the chunks
-		$count = count($chunks);
-
-		// has an extension
-		if($count != 0)
+		
+		if ( strpos($filename, '.') )
 		{
-			// extension can only have alphanumeric chars
-			if(SpoonFilter::isAlphaNumeric($chunks[$count - 1])) return $chunks[$count - 1];
+			$chunks = explode('.', $filename);
+			
+			$ext = end($chunks);
+			
+			if ( SpoonFilter::isAlphaNumeric($ext))
+			{
+				return $ext;
+			}
 		}
 
 		// no extension
