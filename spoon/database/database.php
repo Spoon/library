@@ -779,7 +779,7 @@ class SpoonDatabase
 			throw new SpoonDatabaseException('You need to provide values for an insert query.', 0, $this->password);
 		}
 		
-		$stat = $this->handler->prepare('INSERT INTO `'.$table.'`(`'.implode('`,`', array_keys($values)).'`) VALUES(:'.implode(', :', array_keys($vaues)).')');
+		$stat = $this->handler->prepare('INSERT INTO `'.$table.'`(`'.implode('`,`', array_keys($values)).'`) VALUES(:'.implode(', :', array_keys($values)).')');
 		
 		if($stat === false)
 		{
@@ -788,6 +788,13 @@ class SpoonDatabase
 
 			// throw exceptions
 			throw new SpoonDatabaseException($errorInfo[2]);
+		}
+		
+		$arr = array();
+		
+		foreach ($values as $column => $value)
+		{
+			$arr[':'.$column] = $value;
 		}
 		
 		$affected = $stat->execute($arr);
