@@ -18,7 +18,7 @@ class SpoonDatabaseTest extends PHPUnit_Framework_TestCase
 	public function setup()
 	{
 		// create database object
-		$this->db = new SpoonDatabase('mysql', 'localhost', 'spoon', 'spoon', 'spoon_tests');
+		$this->db = new SpoonDatabase('mysql', '127.0.0.1', 'spoon', 'spoon', 'spoon_tests');
 	}
 
 	public function testExecute()
