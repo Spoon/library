@@ -43,10 +43,10 @@ class SpoonCookie
 				foreach($argument as $key)
 				{
 					// remove from array
-					unset($_COOKIE[(string) $key]);
+					unset($_COOKIE[$key]);
 
 					// unset cookie
-					setcookie((string) $key, null, 1);
+					setcookie( $key, null, 1);
 				}
 			}
 
@@ -54,10 +54,10 @@ class SpoonCookie
 			else
 			{
 				// remove from array
-				unset($_COOKIE[(string) $argument]);
+				unset($_COOKIE[$argument]);
 
 				// unset cookie
-				setcookie((string) $argument, null, 1);
+				setcookie($argument, null, 1);
 			}
 		}
 	}
@@ -80,7 +80,7 @@ class SpoonCookie
 				foreach($argument as $key)
 				{
 					// does NOT exist
-					if(!isset($_COOKIE[(string) $key])) return false;
+					if(!isset($_COOKIE[$key])) return false;
 				}
 			}
 
@@ -88,7 +88,7 @@ class SpoonCookie
 			else
 			{
 				// does NOT exist
-				if(!isset($_COOKIE[(string) $argument])) return false;
+				if(!isset($_COOKIE[($argument])) return false;
 			}
 		}
 
@@ -99,16 +99,20 @@ class SpoonCookie
 	/**
 	 * Gets the value that was stored in a cookie.
 	 *
-	 * @return	mixed			The value that was stored in the cookie.
+	 * @return	mixed			The value that was stored in the cookie or the default value if it doesn't exists.
 	 * @param	string $key		The name of the cookie that should be retrieved.
+	 * @param	mixed $default		The default value to return if the cookie doesn't exists
 	 */
-	public static function get($key)
+	public static function get($key, $default = false)
 	{
 		// redefine key
 		$key = (string) $key;
 
 		// cookie doesn't exist
-		if(!self::exists($key)) return false;
+		if( ! self::exists($key) )
+		{
+			return $default;
+		}
 
 		// fetch base value
 		$value = (get_magic_quotes_gpc()) ? stripslashes($_COOKIE[$key]) : $_COOKIE[$key];
@@ -139,19 +143,12 @@ class SpoonCookie
 	public static function set($key, $value, $time = 86400, $path = '/', $domain = null, $secure = false, $httpOnly = false)
 	{
 		// redefine
-		$key = (string) $key;
 		$value = serialize($value);
-		$time = time() + (int) $time;
-		$path = (string) $path;
-		$domain = ($domain !== null) ? (string) $domain : null;
-		$secure = (bool) $secure;
-		$httpOnly = (bool) $httpOnly;
+		$time += time();
 
 		// set cookie
-		$cookie = setcookie($key, $value, $time, $path, $domain, $secure, $httpOnly);
-
-		// problem occured
-		return ($cookie === false) ? false : true;
+		// return the result (true if the cookie has been created, false otherwise)
+		return ($cookie = setcookie($key, $value, $time, $path, $domain, $secure, $httpOnly));
 	}
 }
 
