@@ -166,6 +166,8 @@ class Spoon
 		$classes['Spoonicalevent'] = 'ical/ical';
 		$classes['spoonlocale'] = 'locale/locale.php';
 		$classes['spoonlog'] = 'log/log.php';
+		$classes['spoonprice'] = 'price/price.php';
+		$classes['spoonpricecurrency'] = 'price/currency.php';
 		$classes['spoonrestclient'] = 'rest/client.php';
 		$classes['spoonsession'] = 'session/session.php';
 		$classes['spoontemplate'] = 'template/template.php';
