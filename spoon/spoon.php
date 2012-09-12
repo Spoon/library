@@ -122,6 +122,7 @@ class Spoon
 		// list of classes and their location
 		$classes = array();
 		$classes['spooncookie'] = 'cookie/cookie.php';
+		$classes['spooncurrency'] = 'price/currency.php';
 		$classes['spoondatabase'] = 'database/database.php';
 		$classes['spoondatagrid'] = 'datagrid/datagrid.php';
 		$classes['spoondatagridcolumn'] = 'datagrid/column.php';
@@ -166,6 +167,7 @@ class Spoon
 		$classes['Spoonicalevent'] = 'ical/ical';
 		$classes['spoonlocale'] = 'locale/locale.php';
 		$classes['spoonlog'] = 'log/log.php';
+		$classes['spoonprice'] = 'price/price.php';
 		$classes['spoonrestclient'] = 'rest/client.php';
 		$classes['spoonsession'] = 'session/session.php';
 		$classes['spoontemplate'] = 'template/template.php';
