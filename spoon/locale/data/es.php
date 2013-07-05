@@ -129,6 +129,7 @@ $locale['countries']['JP'] = 'Japón';
 $locale['countries']['JE'] = 'Jersey';
 $locale['countries']['JO'] = 'Jordania';
 $locale['countries']['KZ'] = 'Kazajistán';
+$locale['countries']['KO'] = 'Kosovo';
 $locale['countries']['KE'] = 'Kenia';
 $locale['countries']['KG'] = 'Kirguistán';
 $locale['countries']['KI'] = 'Kiribati';
