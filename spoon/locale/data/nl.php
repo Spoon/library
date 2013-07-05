@@ -120,6 +120,7 @@ $locale['countries']['CM'] = 'Kameroen';
 $locale['countries']['KZ'] = 'Kazachstan';
 $locale['countries']['KE'] = 'Kenia';
 $locale['countries']['KG'] = 'Kirgizië';
+$locale['countries']['KO'] = 'Kosovo';
 $locale['countries']['KI'] = 'Kiribati';
 $locale['countries']['KW'] = 'Koeweit';
 $locale['countries']['HR'] = 'Kroatië';
