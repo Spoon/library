@@ -130,6 +130,7 @@ $locale['countries']['CG'] = 'Republik Kongo';
 $locale['countries']['HR'] = 'Kroatien';
 $locale['countries']['CU'] = 'Kuba';
 $locale['countries']['KW'] = 'Kuwait';
+$locale['countries']['KO'] = 'Kosovo';
 $locale['countries']['LA'] = 'Laos';
 $locale['countries']['LS'] = 'Lesotho';
 $locale['countries']['LV'] = 'Lettland';

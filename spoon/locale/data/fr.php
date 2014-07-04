@@ -138,6 +138,7 @@ $locale['countries']['JO'] = 'Jordanie';
 $locale['countries']['KZ'] = 'Kazakhstan';
 $locale['countries']['KE'] = 'Kenya';
 $locale['countries']['KG'] = 'Kirghizistan';
+$locale['countries']['KO'] = 'Kosovo';
 $locale['countries']['KI'] = 'Kiribati';
 $locale['countries']['KW'] = 'Koweït';
 $locale['countries']['LA'] = 'Laos';
