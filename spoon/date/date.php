@@ -27,6 +27,8 @@
  */
 class SpoonDate
 {
+	protected static $locales = array();
+
 	/**
 	 * An alias for php's date function that makes weekdays and months language dependant.
 	 *
@@ -51,7 +53,16 @@ class SpoonDate
 		{
 			// weekdays (short & long)
 			$date = str_replace(array('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'), SpoonLocale::getWeekDays($language), $date);
-			$date = str_replace(array('Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'), SpoonLocale::getWeekDays($language, true), $date);
+			$abbreviatedDaysRegexes = array(
+				'/\bMon\b/',
+				'/\bTue\b/',
+				'/\bWed\b/',
+				'/\bThu\b/',
+				'/\bFri\b/',
+				'/\bSat\b/',
+				'/\bSun\b/',
+			);
+			$date = preg_replace($abbreviatedDaysRegexes, SpoonLocale::getWeekDays($language, true), $date);
 
 			// months (short & long)
 			$date = str_replace(array('January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'), SpoonLocale::getMonths($language), $date);
@@ -78,7 +89,13 @@ class SpoonDate
 		$locale = array();
 
 		// fetch language
-		require 'spoon/locale/data/' . $language . '.php';
+		if(!isset(self::$locales[$language]))
+		{
+			require 'spoon/locale/data/' . $language . '.php';
+			self::$locales[$language] = $locale;
+		}
+
+		$locale = self::$locales[$language];
 
 		// get seconds between given timestamp and current timestamp
 		$secondsBetween = time() - $timestamp;

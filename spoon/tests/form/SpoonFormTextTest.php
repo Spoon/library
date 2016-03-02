@@ -1,12 +1,9 @@
 <?php
 
-if(!defined('SPOON_CHARSET')) define('SPOON_CHARSET', 'utf-8');
-
 $includePath = dirname(dirname(dirname(dirname(__FILE__))));
 set_include_path(get_include_path() . PATH_SEPARATOR . $includePath);
 
 require_once 'spoon/spoon.php';
-require_once 'PHPUnit/Framework/TestCase.php';
 
 class SpoonFormTextTest extends PHPUnit_Framework_TestCase
 {
@@ -268,6 +265,10 @@ class SpoonFormTextTest extends PHPUnit_Framework_TestCase
 	public function testIsURL()
 	{
 		$_POST['name'] = 'http://www.spoon-library.com';
+		$this->assertTrue($this->txtName->isURL());
+		$_POST['name'] = 'https://www.spoon-library.com';
+		$this->assertTrue($this->txtName->isURL());
+		$_POST['name'] = 'www.spoon-library.com';
 		$this->assertTrue($this->txtName->isURL());
 		$_POST['name'] = array('foo', 'bar');
 		$this->assertFalse($this->txtName->isURL());

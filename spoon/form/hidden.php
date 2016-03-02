@@ -23,6 +23,7 @@
  *
  *
  * @author		Davy Hellemans <davy@spoon-library.com>
+ * @author		Dieter Vanden Eynde <dieter.vandeneynde@wijs.be>
  * @since		1.0.0
  */
 class SpoonFormHidden extends SpoonFormAttributes
@@ -55,9 +56,10 @@ class SpoonFormHidden extends SpoonFormAttributes
 	/**
 	 * Retrieve the initial or submitted value.
 	 *
+	 * @param	bool[optional] $allowHTML	Is HTML allowed?
 	 * @return	string
 	 */
-	public function getValue()
+	public function getValue($allowHTML = null)
 	{
 		// redefine default value
 		$value = $this->value;
@@ -72,7 +74,10 @@ class SpoonFormHidden extends SpoonFormAttributes
 			if(isset($data[$this->attributes['name']]))
 			{
 				// value
-				$value = (string) $data[$this->attributes['name']];
+				$value = $data[$this->getName()];
+				$value = is_scalar($value) ? (string) $value : 'Array';
+
+				if(!$allowHTML) $value = (Spoon::getCharset() == 'utf-8') ? SpoonFilter::htmlspecialchars($value) : SpoonFilter::htmlentities($value);
 			}
 		}
 
@@ -89,10 +94,9 @@ class SpoonFormHidden extends SpoonFormAttributes
 	{
 		// post/get data
 		$data = $this->getMethod(true);
-
-		// validate
-		if(!(isset($data[$this->attributes['name']]) && trim((string) $data[$this->attributes['name']]) != '')) return false;
-		return true;
+		$value = isset($data[$this->getName()]) ? $data[$this->getName()] : '';
+		$value = is_array($value) ? 'Array' : trim((string) $value);
+		return $value != '';
 	}
 
 
@@ -102,7 +106,7 @@ class SpoonFormHidden extends SpoonFormAttributes
 	 * @return	string
 	 * @param	SpoonTemplate[optional] $template	The template to parse the element in.
 	 */
-	public function parse(SpoonTemplate $template = null)
+	public function parse($template = null)
 	{
 		// start html generation
 		$output = '<input type="hidden" value="' . $this->getValue() . '"';

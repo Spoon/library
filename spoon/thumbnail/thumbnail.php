@@ -447,6 +447,23 @@ class SpoonThumbnail
 		// validate image
 		if($currentImage === false) throw new SpoonThumbnailException('The file you specified is corrupt.');
 
+		// set transparent for current image
+		@imagealphablending($currentImage, false);
+
+		// transparency supported for current image
+		if(in_array($currentType, array(IMG_GIF, 3, IMG_PNG)))
+		{
+			// get transparent color
+			$colorTransparent = @imagecolorallocatealpha($currentImage, 0, 0, 0, 127);
+
+			// any color found?
+			if($colorTransparent !== false)
+			{
+				@imagefill($currentImage, 0, 0, $colorTransparent);
+				@imagesavealpha($currentImage, true);
+			}
+		}
+
 		// create image resource
 		$this->image = @imagecreatetruecolor($newWidth, $newHeight);
 
@@ -574,18 +591,38 @@ class SpoonThumbnail
 		// recalculate
 		if($tempWidth < $this->width || $tempHeight < $this->height)
 		{
+			$recalculatedWidth = (int) floor($currentWidth * ($this->height / $currentHeight));
+			$recalculatedHeight = (int) floor($currentHeight * ($this->width / $currentWidth));
+
 			// current width is smaller than the current height
 			if($currentWidth < $currentHeight)
 			{
 				$tempHeight = $this->height;
-				$tempWidth = (int) floor($currentWidth * ($this->height / $currentHeight));
+				$tempWidth = $recalculatedWidth;
 			}
 
 			// current width is greater than the current height
 			if($currentWidth > $currentHeight)
 			{
 				$tempWidth = $this->width;
-				$tempHeight = (int) floor($currentHeight * ($this->width / $currentWidth));
+				$tempHeight = $recalculatedHeight;
+			}
+
+			// when we're dealing with a square we have to see what's smallest, the width
+			// or the height. The smallest will be recalculated. This is needed so we won't have
+			// any black stripes when resizing the image!
+			if($currentWidth == $currentHeight)
+			{
+				if($this->width >= $this->height)
+				{
+					$tempWidth = $this->width;
+					$tempHeight = $recalculatedHeight;
+				}
+				else
+				{
+					$tempHeight = $this->height;
+					$tempWidth = $recalculatedWidth;
+				}
 			}
 		}
 
@@ -678,13 +715,13 @@ class SpoonThumbnail
 		if($currentType == IMG_GIF)
 		{
 			// get transparent index
-			$transparentIndex = @imagecolortransparent($currentImage);
+			$transparentIndex = @imagecolortransparent($this->image);
 
 			// valid index
 			if($transparentIndex > 0)
 			{
 				// magic
-				$transparentColor = @imagecolorsforindex($currentImage, $transparentIndex);
+				$transparentColor = @imagecolorsforindex($this->image, $transparentIndex);
 				$transparentIndex = @imagecolorallocate($this->image, $transparentColor['red'], $transparentColor['green'], $transparentColor['blue']);
 
 				// fill

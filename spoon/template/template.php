@@ -89,7 +89,7 @@ class SpoonTemplate
 
 
 	/**
- 	 * Creates a template instance and assigns a few default variables.
+	 * Creates a template instance and assigns a few default variables.
 	 */
 	public function __construct()
 	{
@@ -124,7 +124,25 @@ class SpoonTemplate
 	public function assign($variable, $value = null)
 	{
 		// regular function use
-		if($value !== null && $variable != '') $this->variables[(string) $variable] = $value;
+		if($value !== null && $variable != '')
+		{
+			// an array?
+			if(is_array($variable))
+			{
+				// loop array
+				foreach($variable as $key => $variableName)
+				{
+					// value provided?
+					if(isset($value[$key]))
+					{
+						$this->variables[(string) $variableName] = $value[$key];
+					}
+				}
+			}
+
+			// not an array
+			else $this->variables[(string) $variable] = $value;
+		}
 
 		// only 1 argument
 		else
@@ -414,10 +432,11 @@ class SpoonTemplate
 		// doesnt exist
 		if(!isset($this->cache[(string) $name])) throw new SpoonTemplateException('No cache with the name "' . (string) $name . '" is known.');
 
-		// last modification date
-		$time = @filemtime($this->cacheDirectory . '/' . (string) $name . '_cache.tpl');
+		// files doesn't exists
+		if(!file_exists($this->cacheDirectory . '/' . (string) $name . '_cache.tpl')) return false;
 
-		// doesn't exist
+		// last modification date
+		$time = filemtime($this->cacheDirectory . '/' . (string) $name . '_cache.tpl');
 		if($time === false) return false;
 
 		// not valid

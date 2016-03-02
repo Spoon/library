@@ -273,14 +273,17 @@ class SpoonFormDropdown extends SpoonFormAttributes
 			// multiple
 			if(!$this->single)
 			{
-				// field has been submitted
-				if(isset($data[$this->attributes['name']]) && is_array($data[$this->attributes['name']]) && count($data[$this->attributes['name']]) != 0)
-				{
-					// reset selected
-					$this->selected = array();
+				// get the name
+				$name = substr($this->attributes['name'], 0, -2);
 
+				// reset selected
+				$this->selected = array();
+
+				// field has been submitted
+				if(isset($data[$name]) && is_array($data[$name]) && count($data[$name]) != 0)
+				{
 					// loop elements and add the value to the array
-					foreach($data[$this->attributes['name']] as $label => $value) $this->selected[] = $value;
+					foreach($data[$name] as $label => $value) $this->selected[] = $value;
 				}
 			}
 
@@ -344,14 +347,16 @@ class SpoonFormDropdown extends SpoonFormAttributes
 			{
 				// rest
 				$values = null;
+				$value = isset($data[$this->getName()]) ? $data[$this->getName()] : '';
+				$value = is_scalar($value) ? (string) $value : 'Array';
 
 				// external data is allowed
-				if($this->allowExternalData) $values = (string) $data[$this->attributes['name']];
+				if($this->allowExternalData) $values = (string) $value;
 
 				// external data is NOT allowed
 				else
 				{
-					if(isset($allowedValues[(string) $data[$this->attributes['name']]]) || (isset($this->defaultElement[1]) && $this->defaultElement[1] == $data[$this->attributes['name']] && $this->defaultElement[1] != '')) $values = (string) $data[$this->attributes['name']];
+					if(isset($allowedValues[(string) $value]) || (isset($this->defaultElement[1]) && $this->defaultElement[1] == $value && $this->defaultElement[1] != '')) $values = (string) $value;
 				}
 			}
 		}
@@ -446,7 +451,7 @@ class SpoonFormDropdown extends SpoonFormAttributes
 	 * @return	string
 	 * @param	SpoonTemplate[optional] $template	The template to parse the element in.
 	 */
-	public function parse(SpoonTemplate $template = null)
+	public function parse($template = null)
 	{
 		// name is required
 		if($this->attributes['name'] == '') throw new SpoonFormException('A name is required for a dropdown menu. Please provide a name.');

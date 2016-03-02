@@ -23,6 +23,7 @@
  *
  *
  * @author		Davy Hellemans <davy@spoon-library.com>
+ * @author		Dieter Vanden Eynde <dieter@dieterve.be>
  * @since		0.1.1
  */
 class SpoonException extends Exception
@@ -102,10 +103,10 @@ function exceptionHandler($exception)
 	$trace = $exception->getTrace();
 
 	// specific name
-	$name = (is_callable(array($exception, 'getName'))) ? $exception->getName() : get_class($exception);
+	$name = (method_exists($exception, 'getName')) ? $exception->getName() : get_class($exception);
 
 	// spoon type exception
-	if(is_callable(array($exception, 'getName')) && strtolower(substr($exception->getName(), 0, 5)) == 'spoon' && $exception->getCode() != 0)
+	if(method_exists($exception, 'getName') && strtolower(substr($exception->getName(), 0, 5)) == 'spoon' && $exception->getCode() != 0)
 	{
 		$documentation = '&raquo; <a href="http://www.spoon-library.com/exceptions/detail/' . $exception->getCode() . '">view documentation</a>';
 	}
@@ -113,6 +114,7 @@ function exceptionHandler($exception)
 	// request uri?
 	if(!isset($_SERVER['HTTP_HOST'])) $_SERVER['HTTP_HOST'] = '';
 	if(!isset($_SERVER['REQUEST_URI'])) $_SERVER['REQUEST_URI'] = '';
+	if(!isset($_SERVER['REQUEST_METHOD'])) $_SERVER['REQUEST_METHOD'] = '';
 
 	// user agent
 	$userAgent = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '<i>(Unknown)</i>';
@@ -329,32 +331,32 @@ function exceptionHandler($exception)
 	';
 
 	// obfuscate
-	if(is_callable(array($exception, 'getObfuscate')) && count($exception->getObfuscate()) != 0)
+	if(method_exists($exception, 'getObfuscate') && count($exception->getObfuscate()) != 0)
 	{
 		$output = str_replace($exception->getObfuscate(), '***', $output);
 	}
 
 	// custom callback?
-	if(SPOON_EXCEPTION_CALLBACK != '')
+	if(Spoon::getExceptionCallback() != '')
 	{
 		// function
-		if(!strpos(SPOON_EXCEPTION_CALLBACK, '::'))
+		if(!strpos(Spoon::getExceptionCallback(), '::'))
 		{
 			// function actually has been defined
-			if(function_exists(SPOON_EXCEPTION_CALLBACK))
+			if(function_exists(Spoon::getExceptionCallback()))
 			{
-				call_user_func_array(SPOON_EXCEPTION_CALLBACK, array($exception, $output));
+				call_user_func_array(Spoon::getExceptionCallback(), array($exception, $output));
 			}
 
 			// something went wrong
-			else exit('The function stored in SPOON_EXCEPTION_CALLBACK (' . SPOON_EXCEPTION_CALLBACK . ') could not be found.');
+			else exit('The exception callback function (' . Spoon::getExceptionCallback() . ') could not be found.');
 		}
 
 		// method
 		else
 		{
 			// method
-			$method = explode('::', SPOON_EXCEPTION_CALLBACK);
+			$method = explode('::', Spoon::getExceptionCallback());
 
 			// 2 parameters and exists
 			if(count($method) == 2 && is_callable(array($method[0], $method[1])))
@@ -363,7 +365,7 @@ function exceptionHandler($exception)
 			}
 
 			// something went wrong
-			else exit('The method stored in SPOON_EXCEPTION_CALLBACK (' . SPOON_EXCEPTION_CALLBACK . ') cound not be found.');
+			else exit('The exception callback function (' . Spoon::getExceptionCallback() . ') cound not be found.');
 		}
 
 	}
@@ -371,15 +373,24 @@ function exceptionHandler($exception)
 	// default exception handling
 	else
 	{
+		// on CLI we have no use for 2000 lines long report, show short info
+		if(Spoon::inCli())
+		{
+			echo $name . "\n";
+			echo 'Message: ' . $exception->getMessage() . "\n";
+			echo 'File: ' . $exception->getFile() . "\n";
+			echo 'Line: ' . $exception->getLine() . "\n";
+		}
+
 		// debugging enabled (show output)
-		if(SPOON_DEBUG) echo $output;
+		elseif(Spoon::getDebug()) echo $output;
 
 		// debugging disabled
-		else echo SPOON_DEBUG_MESSAGE;
+		else echo Spoon::getDebugMessage();
 	}
 
 	// mail it?
-	if(SPOON_DEBUG_EMAIL != '')
+	if(Spoon::getDebugEmail() != '')
 	{
 		// e-mail headers
 		$headers = "MIME-Version: 1.0\n";
@@ -390,7 +401,7 @@ function exceptionHandler($exception)
 		$headers .= "From: Spoon Library <no-reply@spoon-library.com>\n";
 
 		// send email
-		@mail(SPOON_DEBUG_EMAIL, 'Exception Occured', $output, $headers);
+		@mail(Spoon::getDebugEmail(), 'Exception Occured', $output, $headers);
 	}
 
 	// stop script execution

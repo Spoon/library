@@ -128,13 +128,13 @@ class SpoonFormDate extends SpoonFormInput
 			if($this->isValid())
 			{
 				// define long mask
-				$longMask = str_replace(array('d', 'm', 'Y'), array('dd', 'mm', 'yyyy'), $this->mask);
+				$longMask = str_replace(array('d', 'm', 'Y'), array('dd', 'mm', 'yy'), $this->mask);
 
 				// year found
-				if(strpos($longMask, 'yyyy') !== false && $year === null)
+				if(strpos($longMask, 'yy') !== false && $year === null)
 				{
 					// redefine year
-					$year = substr($data[$this->attributes['name']], strpos($longMask, 'yyyy'), 4);
+					$year = substr($data[$this->attributes['name']], strpos($longMask, 'yy'), 4);
 				}
 
 				// month found
@@ -181,12 +181,17 @@ class SpoonFormDate extends SpoonFormInput
 		{
 			// post/get data
 			$data = $this->getMethod(true);
+			$value = isset($data[$this->getName()]) ? $data[$this->getName()] : '';
 
 			// submitted by post (may be empty)
-			if(isset($data[$this->attributes['name']]))
+			if(is_scalar($value))
 			{
 				// value
 				$value = (string) $data[$this->attributes['name']];
+			}
+			else
+			{
+				$value = 'Array';
 			}
 		}
 
@@ -207,9 +212,11 @@ class SpoonFormDate extends SpoonFormInput
 		{
 			// post/get data
 			$data = $this->getMethod(true);
+			$value = isset($data[$this->getName()]) ? $data[$this->getName()] : '';
+			$value = is_array($value) ? 'Array' : trim((string) $value);
 
 			// check filled status
-			if(!(isset($data[$this->getName()]) && trim((string) $data[$this->getName()]) != ''))
+			if($value == '')
 			{
 				if($error !== null) $this->setError($error);
 				return false;
@@ -233,12 +240,17 @@ class SpoonFormDate extends SpoonFormInput
 		{
 			// post/get data
 			$data = $this->getMethod(true);
+			if(!is_scalar($data[$this->getName()]))
+			{
+				if($error !== null) $this->setError($error);
+				return false;
+			}
 
 			// maxlength checks out (needs to be equal)
 			if(strlen((string) $data[$this->attributes['name']]) == $this->attributes['maxlength'])
 			{
 				// define long mask
-				$longMask = str_replace(array('d', 'm', 'y', 'Y'), array('dd', 'mm', 'yy', 'yyyy'), $this->mask);
+				$longMask = str_replace(array('d', 'm', 'y', 'Y'), array('dd', 'mm', 'y', 'yy'), $this->mask);
 
 				// init vars
 				$year = (int) date('Y');
@@ -246,10 +258,10 @@ class SpoonFormDate extends SpoonFormInput
 				$day = (int) date('d');
 
 				// validate year (yyyy)
-				if(strpos($longMask, 'yyyy') !== false)
+				if(strpos($longMask, 'yy') !== false)
 				{
 					// redefine year
-					$year = substr($data[$this->attributes['name']], strpos($longMask, 'yyyy'), 4);
+					$year = substr($data[$this->attributes['name']], strpos($longMask, 'yy'), 4);
 
 					// not an int
 					if(!SpoonFilter::isInteger($year))
@@ -267,10 +279,10 @@ class SpoonFormDate extends SpoonFormInput
 				}
 
 				// validate year (yy)
-				if(strpos($longMask, 'yy') !== false && strpos($longMask, 'yyyy') === false)
+				if(strpos($longMask, 'y') !== false && strpos($longMask, 'yy') === false)
 				{
 					// redefine year
-					$year = substr($data[$this->attributes['name']], strpos($longMask, 'yy'), 2);
+					$year = substr($data[$this->attributes['name']], strpos($longMask, 'y'), 2);
 
 					// not an int
 					if(!SpoonFilter::isInteger($year))
@@ -359,7 +371,7 @@ class SpoonFormDate extends SpoonFormInput
 	 * @return	string
 	 * @param	SpoonTemplate[optional] $template	The template to parse the element in.
 	 */
-	public function parse(SpoonTemplate $template = null)
+	public function parse($template = null)
 	{
 		// name is required
 		if($this->attributes['name'] == '') throw new SpoonFormException('A name is required for a date field. Please provide a valid name.');
@@ -409,10 +421,13 @@ class SpoonFormDate extends SpoonFormInput
 		$this->mask = $maskCorrected;
 
 		// define maximum length for this element
-		$maskCorrected = str_replace(array('d', 'm', 'y', 'Y'), array('dd', 'mm', 'yy', 'yyyy'), $maskCorrected);
+		$maskCorrected = str_replace(array('d', 'm', 'y', 'Y'), array('dd', 'mm', 'y', 'yy'), $maskCorrected);
 
-		// update maxium length
-		$this->attributes['maxlength'] = strlen($maskCorrected);
+		// update maxium length (count double for 'y' because it's too short otherwise)
+		$this->attributes['maxlength'] = strlen($maskCorrected) + substr_count($maskCorrected, 'y');
+
+		// set data-mask attribute so we don't have to do it manually
+		$this->attributes['data-mask'] = $maskCorrected;
 
 		// update value
 		if($this->defaultValue !== null) $this->setValue($this->defaultValue);

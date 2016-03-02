@@ -129,7 +129,7 @@ class SpoonForm
 		// required field
 		$this->setName($name);
 		$this->add(new SpoonFormHidden('form', $this->name));
-		if(SPOON_CHARSET == 'utf-8') $this->add(new SpoonFormHidden('_utf8', '&#9731;'));
+		if(Spoon::getCharset() == 'utf-8') $this->add(new SpoonFormHidden('_utf8', '&#9731;'));
 		$this->objects['form']->setAttribute('id', SpoonFilter::toCamelCase('form_' . $this->name, '_', true));
 
 		// optional fields
@@ -643,7 +643,7 @@ class SpoonForm
 	public function getAction()
 	{
 		// prevent against xss
-		$action = (SPOON_CHARSET == 'utf-8') ? SpoonFilter::htmlspecialchars($this->action) : SpoonFilter::htmlentities($this->action);
+		$action = (Spoon::getCharset() == 'utf-8') ? SpoonFilter::htmlspecialchars($this->action) : SpoonFilter::htmlentities($this->action);
 
 		return $action;
 	}
@@ -695,7 +695,7 @@ class SpoonForm
 	public function getMethod()
 	{
 		// prevent against xss
-		$method = (SPOON_CHARSET == 'utf-8') ? SpoonFilter::htmlspecialchars($this->method) : SpoonFilter::htmlentities($this->method);
+		$method = (Spoon::getCharset() == 'utf-8') ? SpoonFilter::htmlspecialchars($this->method) : SpoonFilter::htmlentities($this->method);
 
 		return $method;
 	}
@@ -961,7 +961,7 @@ class SpoonForm
 	 *
 	 * @param	SpoonTemplate $template		The template to parse the form in.
 	 */
-	public function parse(SpoonTemplate $template)
+	public function parse($template)
 	{
 		// loop objects
 		foreach($this->objects as $name => $object)
@@ -1099,8 +1099,12 @@ class SpoonForm
 			// token was found
 			else
 			{
+				// get the submitted token
+				$data = $this->getField('form_token')->getMethod(true);
+				$submittedToken = isset( $data['form_token'] ) ? $data['form_token'] : null;
+
 				// compare tokens
-				if($this->getField('form_token')->getValue() != SpoonSession::get('form_token')) $errors .= $this->tokenError;
+				if($submittedToken != SpoonSession::get('form_token')) $errors .= $this->tokenError;
 			}
 		}
 

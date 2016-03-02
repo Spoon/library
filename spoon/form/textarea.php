@@ -76,7 +76,7 @@ class SpoonFormTextarea extends SpoonFormInput
 		if($this->isHTML)
 		{
 			// set value
-			$value = (SPOON_CHARSET == 'utf-8') ? SpoonFilter::htmlspecialchars($value) : SpoonFilter::htmlentities($value);
+			$value = (Spoon::getCharset() == 'utf-8') ? SpoonFilter::htmlspecialchars($value) : SpoonFilter::htmlentities($value);
 		}
 
 		// form submitted
@@ -89,13 +89,17 @@ class SpoonFormTextarea extends SpoonFormInput
 			if(isset($data[$this->getName()]))
 			{
 				// value
-				$value = (string) $data[$this->attributes['name']];
+				$value = isset($data[$this->getName()]) ? $data[$this->getName()] : '';
+				if(is_array($value))
+				{
+					$value = 'Array';
+				}
 
 				// maximum length?
-				if(isset($this->attributes['maxlength']) && $this->attributes['maxlength'] > 0) $value = mb_substr($value, 0, (int) $this->attributes['maxlength'], SPOON_CHARSET);
+				if(isset($this->attributes['maxlength']) && $this->attributes['maxlength'] > 0) $value = mb_substr($value, 0, (int) $this->attributes['maxlength'], Spoon::getCharset());
 
 				// html allowed?
-				if(!$allowHTML) $value = (SPOON_CHARSET == 'utf-8') ? SpoonFilter::htmlspecialchars($value) : SpoonFilter::htmlentities($value);
+				if(!$allowHTML) $value = (Spoon::getCharset() == 'utf-8') ? SpoonFilter::htmlspecialchars($value) : SpoonFilter::htmlentities($value);
 			}
 		}
 
@@ -173,9 +177,15 @@ class SpoonFormTextarea extends SpoonFormInput
 	{
 		// post/get data
 		$data = $this->getMethod(true);
+		$value = isset($data[$this->getName()]) ? $data[$this->getName()] : '';
+		if(is_array($value))
+		{
+			$value = 'Array';
+		}
+		$value = trim((string) $value);
 
 		// validate
-		if(!(isset($data[$this->getName()]) && trim((string) $data[$this->attributes['name']]) != ''))
+		if($value == '')
 		{
 			if($error !== null) $this->setError($error);
 			return false;
@@ -283,7 +293,7 @@ class SpoonFormTextarea extends SpoonFormInput
 	 * @return	string
 	 * @param	SpoonTemplate[optional] $template	The template to parse the element in.
 	 */
-	public function parse(SpoonTemplate $template = null)
+	public function parse($template = null)
 	{
 		// name is required
 		if($this->attributes['name'] == '') throw new SpoonFormException('A name is requird for a textarea. Please provide a valid name.');

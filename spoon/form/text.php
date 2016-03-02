@@ -85,7 +85,7 @@ class SpoonFormText extends SpoonFormInput
 		if($this->isHTML)
 		{
 			// set value
-			$value = (SPOON_CHARSET == 'utf-8') ? SpoonFilter::htmlspecialchars($value) : SpoonFilter::htmlentities($value);
+			$value = (Spoon::getCharset() == 'utf-8') ? SpoonFilter::htmlspecialchars($value) : SpoonFilter::htmlentities($value);
 		}
 
 		// form submitted
@@ -98,13 +98,14 @@ class SpoonFormText extends SpoonFormInput
 			if(isset($data[$this->getName()]))
 			{
 				// value
-				$value = $data[$this->attributes['name']];
+				$value = $data[$this->getName()];
+				$value = is_scalar($value) ? (string) $value : 'Array';
 
 				// maximum length?
-				if(isset($this->attributes['maxlength']) && $this->attributes['maxlength'] > 0) $value = mb_substr($value, 0, (int) $this->attributes['maxlength'], SPOON_CHARSET);
+				if(isset($this->attributes['maxlength']) && $this->attributes['maxlength'] > 0) $value = mb_substr($value, 0, (int) $this->attributes['maxlength'], Spoon::getCharset());
 
 				// html allowed?
-				if(!$allowHTML) $value = (SPOON_CHARSET == 'utf-8') ? SpoonFilter::htmlspecialchars($value) : SpoonFilter::htmlentities($value);
+				if(!$allowHTML) $value = (Spoon::getCharset() == 'utf-8') ? SpoonFilter::htmlspecialchars($value) : SpoonFilter::htmlentities($value);
 			}
 		}
 
@@ -334,9 +335,13 @@ class SpoonFormText extends SpoonFormInput
 	{
 		// post/get data
 		$data = $this->getMethod(true);
+		$value = isset($data[$this->getName()])
+			? $data[$this->getName()]
+			: '';
+		$value = is_array($value) ? 'Array' : trim((string) $value);
 
 		// validate
-		if(!(isset($data[$this->attributes['name']]) && trim((string) $data[$this->attributes['name']]) != ''))
+		if($value == '')
 		{
 			if($error !== null) $this->setError($error);
 			return false;
@@ -713,13 +718,20 @@ class SpoonFormText extends SpoonFormInput
 			$data = $this->getMethod(true);
 
 			// validate
-			if(!isset($data[$this->attributes['name']]) || !SpoonFilter::isURL($data[$this->attributes['name']]))
+			if(isset($data[$this->attributes['name']]) && is_string($data[$this->attributes['name']]))
 			{
-				if($error !== null) $this->setError($error);
-				return false;
-			}
+				$url = $data[$this->attributes['name']];
 
-			return true;
+				// appends http:// if not provided
+				// we deliberately left spoonFilter::isURL unchanged
+				// because SpoonFilter should not validate "www.spoon.be" as true
+				$url = (strncasecmp('http://', $url, 7) && strncasecmp('https://', $url, 8) ? 'http://' : '') . $url;
+
+				if(SpoonFilter::isURL($url))
+				{
+					return true;
+				}
+			}
 		}
 
 		// not submitted
@@ -765,7 +777,7 @@ class SpoonFormText extends SpoonFormInput
 	 * @return	string
 	 * @param	SpoonTemplate[optional] $template	The template to parse the element in.
 	 */
-	public function parse(SpoonTemplate $template = null)
+	public function parse($template = null)
 	{
 		// name is required
 		if($this->attributes['name'] == '') throw new SpoonFormException('A name is required for a textfield. Please provide a name.');
