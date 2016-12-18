@@ -247,13 +247,13 @@ class SpoonFormFile extends SpoonFormAttributes
 		if($this->isFilled())
 		{
 			// get image properties
-			$properties = @getimagesize($_FILES[$this->attributes['name']]['tmp_name']);
+			$mime = @mime_content_type($_FILES[$this->attributes['name']]['tmp_name']);
 
 			// invalid properties
-			if($properties === false) $return = false;
+			if($mime === false) $return = false;
 
 			// search for mime-type
-			else $return = in_array($properties['mime'], $allowedTypes);
+			else $return = in_array($mime, $allowedTypes);
 
 			// add error if needed
 			if(!$return && $error !== null) $this->setError($error);
@@ -385,7 +385,7 @@ class SpoonFormFile extends SpoonFormAttributes
 	 * @return	string
 	 * @param	SpoonTemplate[optional] $template	The template to parse the element in.
 	 */
-	public function parse(SpoonTemplate $template = null)
+	public function parse($template = null)
 	{
 		// name is required
 		if($this->attributes['name'] == '') throw new SpoonFormException('A name is required for a file field. Please provide a name.');
