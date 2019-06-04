@@ -34,7 +34,7 @@ class SpoonLocale
 	 *
 	 * @var	array
 	 */
-	private static $languages = array('de', 'en', 'es', 'fr', 'nl', 'it');
+	private static $languages = array('de', 'en', 'es', 'fr', 'nl', 'it', 'ru');
 
 
 	/**
